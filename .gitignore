@@ -1,24 +1,61 @@
-# build output
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# generated types
-.astro/
+# Virtual Environment
+venv/
+env/
+ENV/
 
-# dependencies
+# Node modules (no necesarios para Flask)
 node_modules/
-
-# logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
 
-# environment variables
-.env
-.env.production
-
-# macOS-specific files
-.DS_Store
-
-# jetbrains setting folder
+# IDE
+.vscode/
 .idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Base de datos local (opcional - incluir si quieres datos iniciales)
+# nuncamerin.db
+
+# Logs
+*.log
+
+# Local config
+.env
+config.local.py
+
+# Archivos específicos de Windows
+*.bat
+
+# Archivos de Astro/Node (no necesarios)
+package-lock.json
+tsconfig.json
+astro.config.mjs

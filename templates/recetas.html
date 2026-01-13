@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Recetas - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>📋 Recetas de Nuncamerin</h2>
+        <a href="{{ url_for('nueva_receta') }}" class="btn btn-success">Nueva Receta</a>
+    </div>
+    
+    {% if recetas %}
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Receta</th>
+                        <th>Te Cuesta</th>
+                        <th>Vas a Cobrar</th>
+                        <th class="hidden-mobile">Ganancia</th>
+                        <th class="hidden-mobile">Multiplicador</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for receta in recetas %}
+                    <tr>
+                        <td>
+                            <strong>{{ receta.nombre }}</strong>
+                            {% if receta.descripcion %}
+                                <br><small style="color: #666;">{{ receta.descripcion }}</small>
+                            {% endif %}
+                        </td>
+                        <td class="cost">
+                            ${{ receta.costo_total | format_price }}
+                            <br><small>Ingredientes</small>
+                        </td>
+                        <td class="price">
+                            ${{ receta.precio_sugerido | format_price }}
+                            <br><small>Precio venta</small>
+                        </td>
+                        <td class="hidden-mobile" style="color: #4299e1; font-weight: 600;">
+                            ${{ (receta.precio_sugerido - receta.costo_total) | format_price }}
+                            <br><small>Ganancia neta</small>
+                        </td>
+                        <td class="hidden-mobile" style="color: #ed8936; font-weight: 600;">
+                            {{ "%.1fx"|format((receta.precio_sugerido / receta.costo_total) if receta.costo_total > 0 else 0) }}
+                            <br><small>{{ "%.0f"|format(receta.margen_ganancia) }}% margen</small>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ url_for('editar_receta', id=receta.id) }}" class="btn">✏️ Editar</a>
+                                <form method="POST" action="{{ url_for('eliminar_receta', id=receta.id) }}" style="display: inline;">
+                                    <button type="submit" class="btn" style="background-color: #f56565; font-size: 0.8em;" 
+                                            onclick="return confirm('¿Eliminar la receta {{ receta.nombre }}?')">
+                                        🗑️
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="margin-top: 2rem; padding: 1rem; background-color: #f8f9fa; border-radius: 4px;">
+            <h4>💡 Cómo Leer la Tabla</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div>
+                    <strong>Te Cuesta:</strong> Suma de todos los ingredientes
+                </div>
+                <div>
+                    <strong>Vas a Cobrar:</strong> Precio final al cliente
+                </div>
+                <div>
+                    <strong>Vas a Ganar:</strong> Tu ganancia neta por unidad
+                </div>
+                <div>
+                    <strong>Multiplicador:</strong> Cuántas veces cobras vs. lo que te cuesta
+                </div>
+            </div>
+            <p style="margin-top: 1rem;"><strong>💰 Tu objetivo:</strong> Generalmente cobras 3x (multiplicador 3.0x = 200% margen)</p>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 3rem;">
+            <h3>🎯 ¡Crea tu Primera Receta!</h3>
+            <p>Aún no tienes recetas registradas. Crea una para ver análisis detallados de costos y ganancias.</p>
+            <a href="{{ url_for('nueva_receta') }}" class="btn btn-success" style="font-size: 1.2em; padding: 1rem 2rem;">Crear Primera Receta</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

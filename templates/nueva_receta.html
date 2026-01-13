@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Receta - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📋 Nueva Receta para Nuncamerin</h2>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="nombre">Nombre de la Receta:</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ej: Torta de Chocolate, Brownie, Cheesecake..." required>
+        </div>
+        
+        <div class="form-group">
+            <label for="descripcion">Descripción (opcional):</label>
+            <textarea id="descripcion" name="descripcion" rows="3" placeholder="Describe brevemente tu receta..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="margen_ganancia">Margen de Ganancia (%):</label>
+            <input type="number" id="margen_ganancia" name="margen_ganancia" step="0.01" min="0" value="200.00" required>
+            <small style="color: #666; display: block; margin-top: 0.5rem;">
+                💡 <strong>Recomendado:</strong> 200% = Cobras 3 veces lo que te cuesta (tu preferencia habitual)
+            </small>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-success">✅ Crear Receta</button>
+            <a href="{{ url_for('recetas') }}" class="btn">❌ Cancelar</a>
+        </div>
+    </form>
+    
+    <div style="margin-top: 2rem; padding: 1rem; background-color: #e8f4fd; border-radius: 4px; border-left: 4px solid #2196f3;">
+        <h4 style="margin: 0 0 1rem 0; color: #1976d2;">💡 Consejos para Crear Recetas</h4>
+        <ul style="margin: 0; padding-left: 1.5rem;">
+            <li><strong>Nombre claro:</strong> Usa nombres descriptivos como "Torta de Vainilla Clásica"</li>
+            <li><strong>Margen típico:</strong> 200% significa que cobras 3 veces lo que te cuesta</li>
+            <li><strong>Después de crear:</strong> Podrás agregar ingredientes y ver el análisis de costos</li>
+            <li><strong>Edición fácil:</strong> Siempre puedes cambiar el margen más tarde</li>
+        </ul>
+    </div>
+</div>
+
+<div class="card">
+    <h3>📊 Ejemplos de Márgenes</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div style="padding: 1rem; background-color: #f8f9fa; border-radius: 4px;">
+            <strong>100%</strong><br>
+            <small>Cobras 2 veces el costo</small>
+        </div>
+        <div style="padding: 1rem; background-color: #fff3e0; border-radius: 4px;">
+            <strong>150%</strong><br>
+            <small>Cobras 2.5 veces el costo</small>
+        </div>
+        <div style="padding: 1rem; background-color: #e8f5e8; border-radius: 4px;">
+            <strong>200%</strong><br>
+            <small>Cobras 3 veces el costo ⭐</small>
+        </div>
+        <div style="padding: 1rem; background-color: #e3f2fd; border-radius: 4px;">
+            <strong>250%</strong><br>
+            <small>Cobras 3.5 veces el costo</small>
+        </div>
+    </div>
+</div>
+{% endblock %}

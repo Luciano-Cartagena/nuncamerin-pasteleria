@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Editar {{ receta.nombre }} - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📋 Editar Receta: {{ receta.nombre }}</h2>
+    
+    <!-- Formulario para editar datos de la receta -->
+    <div class="card" style="margin-bottom: 2rem; background-color: #f8f9fa;">
+        <h3>✏️ Editar Información de la Receta</h3>
+        <form method="POST">
+            <input type="hidden" name="actualizar_receta" value="1">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="nombre">Nombre de la Receta:</label>
+                    <input type="text" id="nombre" name="nombre" value="{{ receta.nombre }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripción:</label>
+                    <input type="text" id="descripcion" name="descripcion" value="{{ receta.descripcion or '' }}" placeholder="Descripción opcional...">
+                </div>
+            </div>
+            <div style="margin-top: 1rem;">
+                <button type="submit" class="btn btn-success">💾 Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2rem;" class="grid-responsive">
+        <div>
+            <h3>Ingredientes de la Receta</h3>
+            {% if ingredientes_receta %}
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Ingrediente</th>
+                                <th>Cantidad</th>
+                                <th>Costo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ing in ingredientes_receta %}
+                            <tr>
+                                <td>
+                                    <strong>{{ ing.ingrediente_nombre }}</strong>
+                                    {% if ing.marca %}<br><small>{{ ing.marca }}</small>{% endif %}
+                                </td>
+                                <td>{{ "%.0f"|format(ing.cantidad_usada) }}{{ ing.unidad_usada }}</td>
+                                <td class="cost">${{ ing.costo_calculado | format_price }}</td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('eliminar_ingrediente_receta', id=ing.id) }}" style="display: inline;">
+                                        <input type="hidden" name="receta_id" value="{{ receta.id }}">
+                                        <button type="submit" class="btn" style="background-color: #f56565; font-size: 0.8em;" onclick="return confirm('¿Eliminar este ingrediente?')">🗑️</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>Esta receta no tiene ingredientes asignados aún.</p>
+            {% endif %}
+            
+            <div class="card" style="margin-top: 2rem;">
+                <h3>➕ Agregar Ingrediente</h3>
+                <form method="POST">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: end;">
+                        <div class="form-group">
+                            <label for="ingrediente_id">Ingrediente:</label>
+                            <select id="ingrediente_id" name="ingrediente_id" required>
+                                <option value="">Seleccionar ingrediente...</option>
+                                {% for ing in todos_ingredientes %}
+                                <option value="{{ ing.id }}">{{ ing.nombre }}{% if ing.marca %} ({{ ing.marca }}){% endif %}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cantidad_usada">Cantidad:</label>
+                            <input type="number" id="cantidad_usada" name="cantidad_usada" step="0.1" min="0.1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="unidad_usada">Unidad:</label>
+                            <select id="unidad_usada" name="unidad_usada" required>
+                                <option value="g">Gramos</option>
+                                <option value="kg">Kilogramos</option>
+                                <option value="ml">Mililitros</option>
+                                <option value="l">Litros</option>
+                                <option value="unidad">Unidades</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">Agregar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div>
+            <div class="card" style="margin: 0;">
+                <h3>💰 Análisis de Costos y Ganancias</h3>
+                
+                <!-- Costo de Ingredientes -->
+                <div class="cost-card" style="background-color: #fed7d7; border-left: 4px solid #f56565;">
+                    <h4 style="color: #c53030;">📊 Lo que te cuesta hacer:</h4>
+                    <div class="amount" style="color: #c53030;">
+                        ${{ costo_total | format_price }}
+                    </div>
+                    <small>Costo total de ingredientes</small>
+                </div>
+                
+                <!-- Precio de Venta -->
+                <div class="cost-card" style="background-color: #c6f6d5; border-left: 4px solid #48bb78;">
+                    <h4 style="color: #2f855a;">💵 Lo que vas a cobrar:</h4>
+                    <div class="amount" style="color: #2f855a;">
+                        ${{ precio_sugerido | format_price }}
+                    </div>
+                    <small>Precio de venta ({{ "%.0f"|format(receta.margen_ganancia) }}% ganancia)</small>
+                </div>
+                
+                <!-- Ganancia -->
+                <div class="cost-card" style="background-color: #bee3f8; border-left: 4px solid #4299e1;">
+                    <h4 style="color: #2b6cb0;">🎯 Lo que vas a ganar:</h4>
+                    <div class="amount" style="color: #2b6cb0;">
+                        ${{ (precio_sugerido - costo_total) | format_price }}
+                    </div>
+                    <small>Ganancia neta por unidad</small>
+                </div>
+                
+                <!-- Análisis Detallado -->
+                <div style="border-top: 2px solid #ddd; padding-top: 1rem;">
+                    <h4>📈 Análisis Detallado</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="background-color: #f5f5f5; padding: 0.8rem; border-radius: 4px;">
+                            <strong>Multiplicador:</strong><br>
+                            <span style="font-size: 1.3em; color: #ff9800;">
+                                {{ "%.1fx"|format((precio_sugerido / costo_total) if costo_total > 0 else 0) }}
+                            </span><br>
+                            <small>Cobras {{ "%.1f"|format((precio_sugerido / costo_total) if costo_total > 0 else 0) }} veces lo que te cuesta</small>
+                        </div>
+                        
+                        <div style="background-color: #f5f5f5; padding: 0.8rem; border-radius: 4px;">
+                            <strong>% de Ganancia:</strong><br>
+                            <span style="font-size: 1.3em; color: #ff9800;">
+                                {{ "%.0f"|format(receta.margen_ganancia) }}%
+                            </span><br>
+                            <small>Margen configurado</small>
+                        </div>
+                    </div>
+                    
+                    <div style="background-color: #fff3e0; padding: 0.8rem; border-radius: 4px;">
+                        <strong>💡 Interpretación:</strong><br>
+                        {% set multiplicador = (precio_sugerido / costo_total) if costo_total > 0 else 0 %}
+                        {% if multiplicador >= 3 %}
+                            <span style="color: #2e7d32;">✅ Excelente margen - Cobras {{ "%.1f"|format(multiplicador) }} veces el costo</span>
+                        {% elif multiplicador >= 2 %}
+                            <span style="color: #f57c00;">⚠️ Margen moderado - Cobras {{ "%.1f"|format(multiplicador) }} veces el costo</span>
+                        {% else %}
+                            <span style="color: #d32f2f;">❌ Margen bajo - Solo cobras {{ "%.1f"|format(multiplicador) }} veces el costo</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <!-- Información de la Receta -->
+                <div style="margin-top: 1rem;">
+                    <h4>📝 Información de la Receta</h4>
+                    <p><strong>Nombre:</strong> {{ receta.nombre }}</p>
+                    <p><strong>Descripción:</strong> {{ receta.descripcion or "Sin descripción" }}</p>
+                    <p><strong>Creada:</strong> {{ receta.fecha_creacion[:16] }}</p>
+                    <p><strong>Modificada:</strong> {{ receta.fecha_modificacion[:16] }}</p>
+                </div>
+                
+                <!-- Botones de Acción -->
+                <div class="action-buttons" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
+                    <button onclick="cambiarMargen()" class="btn" style="background-color: #ed8936;" 
+                            data-margen="{{ receta.margen_ganancia }}" 
+                            data-costo="{{ costo_total }}"
+                            data-receta-id="{{ receta.id }}">
+                        🔧 Cambiar Margen
+                    </button>
+                    
+                    <form method="POST" action="{{ url_for('eliminar_receta', id=receta.id) }}" style="display: inline;">
+                        <button type="submit" class="btn" style="background-color: #f56565;" 
+                                onclick="return confirm('¿Estás seguro de que quieres eliminar esta receta? Esta acción no se puede deshacer.')">
+                            🗑️ Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 2rem;">
+        <a href="{{ url_for('recetas') }}" class="btn">← Volver a Recetas</a>
+    </div>
+</div>
+
+<div class="card">
+    <h3>💡 Consejos para Nuncamerin</h3>
+    <ul>
+        <li><strong>Precisión:</strong> Usa una balanza para medir exactamente los gramos que usas</li>
+        <li><strong>Actualización:</strong> Revisa los precios de ingredientes regularmente</li>
+        <li><strong>Margen:</strong> Considera costos adicionales (gas, luz, tiempo) en tu margen</li>
+        <li><strong>Competencia:</strong> Compara tu precio sugerido con el mercado local</li>
+    </ul>
+</div>
+
+<script>
+function cambiarMargen() {
+    const button = event.target;
+    const margenActual = parseFloat(button.dataset.margen);
+    const recetaId = button.dataset.recetaId;
+    
+    const nuevoMargen = prompt('Margen actual: ' + margenActual + '%\n\nIngresa el nuevo margen de ganancia (%):\n\nEjemplos:\n- 200% = Cobras 3 veces el costo\n- 150% = Cobras 2.5 veces el costo\n- 100% = Cobras 2 veces el costo', margenActual);
+    
+    if (nuevoMargen !== null && nuevoMargen !== '') {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/recetas/' + recetaId + '/cambiar_margen';
+        
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'nuevo_margen';
+        input.value = nuevoMargen;
+        
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Función para calcular y mostrar ejemplos de margen
+function mostrarEjemplosMargen() {
+    const button = document.querySelector('[data-costo]');
+    if (!button) return;
+    
+    const costoTotal = parseFloat(button.dataset.costo);
+    
+    const ejemplos = [
+        { margen: 100, descripcion: "Cobras 2 veces lo que te cuesta" },
+        { margen: 150, descripcion: "Cobras 2.5 veces lo que te cuesta" },
+        { margen: 200, descripcion: "Cobras 3 veces lo que te cuesta (tu preferencia)" },
+        { margen: 250, descripcion: "Cobras 3.5 veces lo que te cuesta" },
+        { margen: 300, descripcion: "Cobras 4 veces lo que te cuesta" }
+    ];
+    
+    console.log("Ejemplos de márgenes para esta receta:");
+    ejemplos.forEach(function(ej) {
+        const precioVenta = costoTotal * (1 + ej.margen / 100);
+        const ganancia = precioVenta - costoTotal;
+        console.log(ej.margen + '%: Precio ' + precioVenta.toFixed(2) + ' - Ganancia ' + ganancia.toFixed(2) + ' - ' + ej.descripcion);
+    });
+}
+
+// Mostrar ejemplos en la consola al cargar
+document.addEventListener('DOMContentLoaded', mostrarEjemplosMargen);
+</script>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Ingrediente - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📦 Nuevo Ingrediente para Nuncamerin</h2>
+    
+    <div style="background-color: #e3f2fd; padding: 1rem; border-radius: 4px; margin-bottom: 2rem;">
+        <h4>💡 Ejemplos por Tipo de Ingrediente</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+                <p><strong>Por Peso (Chocolate):</strong><br>
+                Nombre: Chocolate Negro<br>
+                Marca: Águila<br>
+                Precio: $850, Peso: 200, Unidad: g<br>
+                <em>→ $4,25 por gramo</em></p>
+            </div>
+            <div>
+                <p><strong>Por Unidad (Huevos):</strong><br>
+                Nombre: Huevos<br>
+                Marca: Granja del Sol<br>
+                Precio: $180, Cantidad: 6, Unidad: unidad<br>
+                <em>→ $30,00 por huevo</em></p>
+            </div>
+        </div>
+    </div>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="nombre">Nombre del Ingrediente:</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ej: Chocolate Negro, Harina 0000, Azúcar" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="marca">Marca (opcional):</label>
+            <input type="text" id="marca" name="marca" placeholder="Ej: Águila, Blancaflor, Ledesma">
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label for="precio_paquete">Precio del Paquete:</label>
+                <input type="number" id="precio_paquete" name="precio_paquete" step="0.01" min="0.01" placeholder="850.00" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="peso_paquete">Peso/Cantidad del Paquete:</label>
+                <input type="number" id="peso_paquete" name="peso_paquete" step="0.001" min="0.001" placeholder="200 (gramos) o 6 (unidades)" required>
+                <small style="color: #666;">Para huevos: cantidad de huevos. Para harina: peso en gramos/kg</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="unidad_paquete">Unidad del Paquete:</label>
+                <select id="unidad_paquete" name="unidad_paquete" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="g">Gramos (g)</option>
+                    <option value="kg">Kilogramos (kg)</option>
+                    <option value="ml">Mililitros (ml)</option>
+                    <option value="l">Litros (l)</option>
+                    <option value="unidad">Unidades (ej: huevos, limones)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 1rem; border-radius: 4px; margin: 1rem 0;">
+            <h4>🧮 Vista Previa del Cálculo</h4>
+            <p id="calculo-preview">Completa los campos para ver el precio por gramo</p>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-success">Crear Ingrediente</button>
+            <a href="{{ url_for('ingredientes') }}" class="btn">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function actualizarCalculo() {
+    const precio = parseFloat(document.getElementById('precio_paquete').value) || 0;
+    const peso = parseFloat(document.getElementById('peso_paquete').value) || 0;
+    const unidad = document.getElementById('unidad_paquete').value;
+    
+    if (precio > 0 && peso > 0 && unidad) {
+        let precioPorUnidad;
+        let textoUnidad;
+        
+        if (unidad === 'unidad') {
+            // Para ingredientes por unidad (huevos, limones, etc.)
+            precioPorUnidad = precio / peso;
+            textoUnidad = 'unidad';
+            
+            const precioFormateado = precioPorUnidad.toLocaleString('es-AR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            const ejemploFormateado = (precioPorUnidad * 2).toLocaleString('es-AR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            document.getElementById('calculo-preview').innerHTML = 
+                `<strong>Precio por ${textoUnidad}: $${precioFormateado}</strong><br>
+                 <small>Si usas 2 ${textoUnidad}s en una receta, costará: $${ejemploFormateado}</small>`;
+        } else {
+            // Para ingredientes por peso/volumen
+            let pesoEnGramos = peso;
+            if (unidad === 'kg') pesoEnGramos = peso * 1000;
+            else if (unidad === 'l') pesoEnGramos = peso * 1000;
+            
+            const precioPorGramo = precio / pesoEnGramos;
+            
+            const precioFormateado = precioPorGramo.toLocaleString('es-AR', {
+                minimumFractionDigits: 4,
+                maximumFractionDigits: 4
+            });
+            
+            const ejemploFormateado = (precioPorGramo * 100).toLocaleString('es-AR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            document.getElementById('calculo-preview').innerHTML = 
+                `<strong>Precio por gramo: $${precioFormateado}</strong><br>
+                 <small>Si usas 100g en una receta, costará: $${ejemploFormateado}</small>`;
+        }
+    } else {
+        document.getElementById('calculo-preview').innerHTML = 'Completa los campos para ver el precio por gramo';
+    }
+}
+
+document.getElementById('precio_paquete').addEventListener('input', actualizarCalculo);
+document.getElementById('peso_paquete').addEventListener('input', actualizarCalculo);
+document.getElementById('unidad_paquete').addEventListener('change', actualizarCalculo);
+</script>
+{% endblock %}

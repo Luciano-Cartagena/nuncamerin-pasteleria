@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Editar {{ ingrediente.nombre }} - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📦 Editar Ingrediente: {{ ingrediente.nombre }}</h2>
+    
+    <div style="background-color: #fff3cd; padding: 1rem; border-radius: 4px; margin-bottom: 2rem; border-left: 4px solid #ffc107;">
+        <h4>⚠️ Importante</h4>
+        <p>Al cambiar el precio de este ingrediente, se actualizarán automáticamente los costos de todas las recetas que lo usen.</p>
+    </div>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="nombre">Nombre del Ingrediente:</label>
+            <input type="text" id="nombre" name="nombre" value="{{ ingrediente.nombre }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="marca">Marca:</label>
+            <input type="text" id="marca" name="marca" value="{{ ingrediente.marca or '' }}" placeholder="Opcional">
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label for="precio_paquete">Precio del Paquete:</label>
+                <input type="number" id="precio_paquete" name="precio_paquete" step="0.01" min="0.01" value="{{ ingrediente.precio_paquete }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="peso_paquete">Peso/Cantidad del Paquete:</label>
+                <input type="number" id="peso_paquete" name="peso_paquete" step="0.001" min="0.001" value="{{ ingrediente.peso_paquete }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="unidad_paquete">Unidad del Paquete:</label>
+                <select id="unidad_paquete" name="unidad_paquete" required>
+                    <option value="g" {% if ingrediente.unidad_paquete == 'g' %}selected{% endif %}>Gramos (g)</option>
+                    <option value="kg" {% if ingrediente.unidad_paquete == 'kg' %}selected{% endif %}>Kilogramos (kg)</option>
+                    <option value="ml" {% if ingrediente.unidad_paquete == 'ml' %}selected{% endif %}>Mililitros (ml)</option>
+                    <option value="l" {% if ingrediente.unidad_paquete == 'l' %}selected{% endif %}>Litros (l)</option>
+                    <option value="unidad" {% if ingrediente.unidad_paquete == 'unidad' %}selected{% endif %}>Unidades (ej: huevos, limones)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 1rem; border-radius: 4px; margin: 1rem 0;">
+            <h4>🧮 Vista Previa del Cálculo</h4>
+            <p id="calculo-preview">Precio por gramo actual</p>
+        </div>
+        
+        <div style="background-color: #e3f2fd; padding: 1rem; border-radius: 4px; margin: 1rem 0;">
+            <h4>📊 Información Actual</h4>
+            <p><strong>Última actualización:</strong> {{ ingrediente.fecha_actualizacion[:16] }}</p>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-success">Actualizar Ingrediente</button>
+            <a href="{{ url_for('ingredientes') }}" class="btn">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function actualizarCalculo() {
+    const precio = parseFloat(document.getElementById('precio_paquete').value) || 0;
+    const peso = parseFloat(document.getElementById('peso_paquete').value) || 0;
+    const unidad = document.getElementById('unidad_paquete').value;
+    
+    if (precio > 0 && peso > 0 && unidad) {
+        let pesoEnGramos = peso;
+        if (unidad === 'kg') pesoEnGramos = peso * 1000;
+        else if (unidad === 'l') pesoEnGramos = peso * 1000;
+        
+        const precioPorGramo = precio / pesoEnGramos;
+        
+        // Formatear números con punto para miles y coma para decimales
+        const precioFormateado = precioPorGramo.toLocaleString('es-AR', {
+            minimumFractionDigits: 4,
+            maximumFractionDigits: 4
+        });
+        
+        const ejemploFormateado = (precioPorGramo * 100).toLocaleString('es-AR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        
+        document.getElementById('calculo-preview').innerHTML = 
+            `<strong>Precio por gramo: $${precioFormateado}</strong><br>
+             <small>Si usas 100g en una receta, costará: $${ejemploFormateado}</small>`;
+    } else {
+        document.getElementById('calculo-preview').innerHTML = 'Completa los campos para ver el precio por gramo';
+    }
+}
+
+// Calcular al cargar la página
+document.addEventListener('DOMContentLoaded', actualizarCalculo);
+
+document.getElementById('precio_paquete').addEventListener('input', actualizarCalculo);
+document.getElementById('peso_paquete').addEventListener('input', actualizarCalculo);
+document.getElementById('unidad_paquete').addEventListener('change', actualizarCalculo);
+</script>
+{% endblock %}

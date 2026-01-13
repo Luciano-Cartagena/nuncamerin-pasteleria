@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Ingredientes - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+        <h2>📦 Ingredientes de Nuncamerin</h2>
+        <a href="{{ url_for('nuevo_ingrediente') }}" class="btn btn-success">➕ Nuevo Ingrediente</a>
+    </div>
+    
+    {% if ingredientes %}
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Ingrediente</th>
+                        <th>Precio Paquete</th>
+                        <th>Peso/Cantidad</th>
+                        <th>Precio por Gramo</th>
+                        <th class="hidden-mobile">Actualización</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ingrediente in ingredientes %}
+                    <tr>
+                        <td>
+                            <strong>{{ ingrediente.nombre }}</strong>
+                            {% if ingrediente.marca %}<br><small style="color: #666;">{{ ingrediente.marca }}</small>{% endif %}
+                        </td>
+                        <td class="price">${{ ingrediente.precio_paquete | format_price }}</td>
+                        <td>{{ "%.0f"|format(ingrediente.peso_paquete) }}{{ ingrediente.unidad_paquete }}</td>
+                        <td class="cost">
+                            {% if ingrediente.unidad_paquete == 'unidad' %}
+                                ${{ ingrediente.precio_por_gramo_calc | format_price }}/u
+                            {% else %}
+                                ${{ ingrediente.precio_por_gramo_calc | format_price_per_gram }}/g
+                            {% endif %}
+                        </td>
+                        <td class="hidden-mobile">{{ ingrediente.fecha_actualizacion[:10] }}</td>
+                        <td>
+                            <a href="{{ url_for('editar_ingrediente', id=ingrediente.id) }}" class="btn" style="font-size: 0.8em;">✏️ Editar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card" style="background-color: #f8f9fa; margin-top: 1rem;">
+            <h4>💡 Cómo Leer la Tabla</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.9rem;">
+                <div>
+                    <strong>Precio Paquete:</strong><br>
+                    Lo que pagaste por el paquete completo
+                </div>
+                <div>
+                    <strong>Peso/Cantidad:</strong><br>
+                    Cuánto pesa o contiene el paquete
+                </div>
+                <div>
+                    <strong>Precio por Gramo:</strong><br>
+                    Cuánto te cuesta cada gramo que uses
+                </div>
+                <div>
+                    <strong>Formato:</strong><br>
+                    Miles con punto, decimales con coma
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center" style="padding: 3rem;">
+            <h3>🎯 ¡Empecemos!</h3>
+            <p>Aún no tienes ingredientes registrados. Agrega tu primer ingrediente para comenzar.</p>
+            <p><strong>Ejemplo:</strong> Chocolate Negro Águila - $850 por 200g</p>
+            <a href="{{ url_for('nuevo_ingrediente') }}" class="btn btn-success" style="font-size: 1.2em; padding: 1rem 2rem;">Agregar Primer Ingrediente</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
