@@ -3,7 +3,7 @@
 {% block content %}
 <div class="card text-center">
     <h2>🧁 Bienvenido a Nuncamerin</h2>
-    <p>Sistema de gestión de costos diseñado específicamente para tu pastelería. Controla ingredientes, calcula costos por gramo y optimiza tus precios.</p>
+    <p>Sistema de gestión de costos para tu pastelería. Controla ingredientes, calcula costos y optimiza precios.</p>
     
     <div class="grid-responsive" style="margin-top: 2rem;">
         <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
@@ -26,59 +26,9 @@
     </div>
 </div>
 
-<div class="card">
-    <h3 class="text-center">🎯 Cómo Funciona</h3>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-        <div class="cost-card" style="background-color: #e6fffa; border-left: 4px solid #38b2ac;">
-            <h4 style="color: #2c7a7b;">1. 📦 Registra Ingredientes</h4>
-            <p><strong>Ejemplo:</strong> Chocolate Águila<br>
-            💰 $850 por 200g<br>
-            <em>📊 Sistema: $4,25 por gramo</em></p>
-        </div>
-        <div class="cost-card" style="background-color: #fef5e7; border-left: 4px solid #ed8936;">
-            <h4 style="color: #c05621;">2. 📋 Crea Recetas</h4>
-            <p><strong>Ejemplo:</strong> Brownie<br>
-            🥄 150g de chocolate<br>
-            <em>💵 Costo: $637,50</em></p>
-        </div>
-        <div class="cost-card" style="background-color: #f0fff4; border-left: 4px solid #48bb78;">
-            <h4 style="color: #2f855a;">3. 💰 Calcula Precios</h4>
-            <p>➕ Suma ingredientes<br>
-            📈 Aplica tu margen<br>
-            <em>🎯 Precio ideal: $1.912,50</em></p>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <h3 class="text-center">✨ Ventajas del Sistema</h3>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-        <div style="text-align: center; padding: 1rem;">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚖️</div>
-            <strong>Precisión por Gramo</strong>
-            <p style="font-size: 0.9rem; color: #666;">Calcula exactamente cuánto cuesta cada gramo</p>
-        </div>
-        <div style="text-align: center; padding: 1rem;">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏷️</div>
-            <strong>Control de Marcas</strong>
-            <p style="font-size: 0.9rem; color: #666;">Diferencia precios entre marcas</p>
-        </div>
-        <div style="text-align: center; padding: 1rem;">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🤖</div>
-            <strong>Automático</strong>
-            <p style="font-size: 0.9rem; color: #666;">Sin calculadora, todo se actualiza solo</p>
-        </div>
-        <div style="text-align: center; padding: 1rem;">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📈</div>
-            <strong>Margen Personalizable</strong>
-            <p style="font-size: 0.9rem; color: #666;">Ajusta ganancia por producto</p>
-        </div>
-    </div>
-</div>
-
 <div class="card text-center" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
-    <h3>🚀 ¡Empieza Ahora!</h3>
-    <p>Optimiza tus costos y maximiza tus ganancias con Nuncamerin</p>
+    <h3>🚀 ¡Empezá Ahora!</h3>
+    <p>Optimizá tus costos y maximizá tus ganancias</p>
     <div class="action-buttons">
         <a href="{{ url_for('nuevo_ingrediente') }}" class="btn btn-success" style="font-size: 1.1rem;">📦 Agregar Primer Ingrediente</a>
         <a href="{{ url_for('nueva_receta') }}" class="btn" style="background-color: #667eea;">📋 Crear Primera Receta</a>
