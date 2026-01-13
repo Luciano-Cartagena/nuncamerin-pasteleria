@@ -8,7 +8,7 @@
     
     <div style="background-color: #e3f2fd; padding: 1rem; border-radius: 4px; margin-bottom: 2rem;">
         <h4>💡 Ejemplos por Tipo de Ingrediente</h4>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-grid-2">
             <div>
                 <p><strong>Por Peso (Chocolate):</strong><br>
                 Nombre: Chocolate Negro<br>
@@ -37,7 +37,7 @@
             <input type="text" id="marca" name="marca" placeholder="Ej: Águila, Blancaflor, Ledesma">
         </div>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+        <div class="form-grid-4">
             <div class="form-group">
                 <label for="precio_paquete">Precio del Paquete:</label>
                 <input type="number" id="precio_paquete" name="precio_paquete" step="0.01" min="0.01" placeholder="850.00" required>
@@ -67,7 +67,7 @@
             <p id="calculo-preview">Completa los campos para ver el precio por gramo</p>
         </div>
         
-        <div style="margin-top: 2rem;">
+        <div class="action-buttons">
             <button type="submit" class="btn btn-success">Crear Ingrediente</button>
             <a href="{{ url_for('ingredientes') }}" class="btn">Cancelar</a>
         </div>

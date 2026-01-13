@@ -22,7 +22,7 @@
             <input type="text" id="marca" name="marca" value="{{ ingrediente.marca or '' }}" placeholder="Opcional">
         </div>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+        <div class="form-grid-4">
             <div class="form-group">
                 <label for="precio_paquete">Precio del Paquete:</label>
                 <input type="number" id="precio_paquete" name="precio_paquete" step="0.01" min="0.01" value="{{ ingrediente.precio_paquete }}" required>
@@ -55,7 +55,7 @@
             <p><strong>Última actualización:</strong> {{ ingrediente.fecha_actualizacion[:16] }}</p>
         </div>
         
-        <div style="margin-top: 2rem;">
+        <div class="action-buttons">
             <button type="submit" class="btn btn-success">Actualizar Ingrediente</button>
             <a href="{{ url_for('ingredientes') }}" class="btn">Cancelar</a>
         </div>
