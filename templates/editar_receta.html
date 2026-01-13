@@ -11,7 +11,7 @@
         <h3>✏️ Editar Información de la Receta</h3>
         <form method="POST">
             <input type="hidden" name="actualizar_receta" value="1">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-grid-2">
                 <div class="form-group">
                     <label for="nombre">Nombre de la Receta:</label>
                     <input type="text" id="nombre" name="nombre" value="{{ receta.nombre }}" required>
@@ -21,14 +21,14 @@
                     <input type="text" id="descripcion" name="descripcion" value="{{ receta.descripcion or '' }}" placeholder="Descripción opcional...">
                 </div>
             </div>
-            <div style="margin-top: 1rem;">
+            <div class="action-buttons">
                 <button type="submit" class="btn btn-success">💾 Guardar Cambios</button>
             </div>
         </form>
     </div>
     
-    <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2rem;" class="grid-responsive">
-        <div>
+    <div class="recipe-layout">
+        <div class="recipe-main">
             <h3>Ingredientes de la Receta</h3>
             {% if ingredientes_receta %}
                 <div class="table-container">
@@ -68,7 +68,7 @@
             <div class="card" style="margin-top: 2rem;">
                 <h3>➕ Agregar Ingrediente</h3>
                 <form method="POST">
-                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: end;">
+                    <div class="form-grid-4">
                         <div class="form-group">
                             <label for="ingrediente_id">Ingrediente:</label>
                             <select id="ingrediente_id" name="ingrediente_id" required>
@@ -96,6 +96,7 @@
                         </div>
                         
                         <div class="form-group">
+                            <label>&nbsp;</label>
                             <button type="submit" class="btn btn-success">Agregar</button>
                         </div>
                     </div>
@@ -103,68 +104,74 @@
             </div>
         </div>
         
-        <div>
+        <div class="recipe-sidebar">
             <div class="card" style="margin: 0;">
-                <h3>💰 Análisis de Costos y Ganancias</h3>
+                <h3>💰 Análisis de Costos</h3>
                 
-                <!-- Costo de Ingredientes -->
-                <div class="cost-card" style="background-color: #fed7d7; border-left: 4px solid #f56565;">
-                    <h4 style="color: #c53030;">📊 Lo que te cuesta hacer:</h4>
-                    <div class="amount" style="color: #c53030;">
-                        ${{ costo_total | format_price }}
+                <div class="cost-analysis">
+                    <!-- Costo de Ingredientes -->
+                    <div class="cost-card" style="background-color: #fed7d7; border-left: 4px solid #f56565;">
+                        <h4 style="color: #c53030;">📊 Te cuesta hacer</h4>
+                        <div class="amount" style="color: #c53030;">
+                            ${{ costo_total | format_price }}
+                        </div>
+                        <small>Costo ingredientes</small>
                     </div>
-                    <small>Costo total de ingredientes</small>
-                </div>
-                
-                <!-- Precio de Venta -->
-                <div class="cost-card" style="background-color: #c6f6d5; border-left: 4px solid #48bb78;">
-                    <h4 style="color: #2f855a;">💵 Lo que vas a cobrar:</h4>
-                    <div class="amount" style="color: #2f855a;">
-                        ${{ precio_sugerido | format_price }}
+                    
+                    <!-- Precio de Venta -->
+                    <div class="cost-card" style="background-color: #c6f6d5; border-left: 4px solid #48bb78;">
+                        <h4 style="color: #2f855a;">💵 Vas a cobrar</h4>
+                        <div class="amount" style="color: #2f855a;">
+                            ${{ precio_sugerido | format_price }}
+                        </div>
+                        <small>{{ "%.0f"|format(receta.margen_ganancia) }}% ganancia</small>
                     </div>
-                    <small>Precio de venta ({{ "%.0f"|format(receta.margen_ganancia) }}% ganancia)</small>
-                </div>
-                
-                <!-- Ganancia -->
-                <div class="cost-card" style="background-color: #bee3f8; border-left: 4px solid #4299e1;">
-                    <h4 style="color: #2b6cb0;">🎯 Lo que vas a ganar:</h4>
-                    <div class="amount" style="color: #2b6cb0;">
-                        ${{ (precio_sugerido - costo_total) | format_price }}
+                    
+                    <!-- Ganancia -->
+                    <div class="cost-card" style="background-color: #bee3f8; border-left: 4px solid #4299e1;">
+                        <h4 style="color: #2b6cb0;">🎯 Vas a ganar</h4>
+                        <div class="amount" style="color: #2b6cb0;">
+                            ${{ (precio_sugerido - costo_total) | format_price }}
+                        </div>
+                        <small>Ganancia neta</small>
                     </div>
-                    <small>Ganancia neta por unidad</small>
                 </div>
                 
                 <!-- Análisis Detallado -->
-                <div style="border-top: 2px solid #ddd; padding-top: 1rem;">
+                <div style="border-top: 2px solid #ddd; padding-top: 1rem; margin-top: 1rem;">
                     <h4>📈 Análisis Detallado</h4>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                        <div style="background-color: #f5f5f5; padding: 0.8rem; border-radius: 4px;">
-                            <strong>Multiplicador:</strong><br>
-                            <span style="font-size: 1.3em; color: #ff9800;">
+                    <div class="detailed-analysis">
+                        <div class="analysis-item">
+                            <strong>Multiplicador</strong>
+                            <div class="analysis-value">
                                 {{ "%.1fx"|format((precio_sugerido / costo_total) if costo_total > 0 else 0) }}
-                            </span><br>
-                            <small>Cobras {{ "%.1f"|format((precio_sugerido / costo_total) if costo_total > 0 else 0) }} veces lo que te cuesta</small>
+                            </div>
+                            <div class="analysis-description">
+                                Cobras {{ "%.1f"|format((precio_sugerido / costo_total) if costo_total > 0 else 0) }} veces el costo
+                            </div>
                         </div>
                         
-                        <div style="background-color: #f5f5f5; padding: 0.8rem; border-radius: 4px;">
-                            <strong>% de Ganancia:</strong><br>
-                            <span style="font-size: 1.3em; color: #ff9800;">
+                        <div class="analysis-item">
+                            <strong>% Ganancia</strong>
+                            <div class="analysis-value">
                                 {{ "%.0f"|format(receta.margen_ganancia) }}%
-                            </span><br>
-                            <small>Margen configurado</small>
+                            </div>
+                            <div class="analysis-description">
+                                Margen configurado
+                            </div>
                         </div>
                     </div>
                     
-                    <div style="background-color: #fff3e0; padding: 0.8rem; border-radius: 4px;">
+                    <div style="background-color: #fff3e0; padding: 0.8rem; border-radius: 4px; margin-top: 1rem;">
                         <strong>💡 Interpretación:</strong><br>
                         {% set multiplicador = (precio_sugerido / costo_total) if costo_total > 0 else 0 %}
                         {% if multiplicador >= 3 %}
-                            <span style="color: #2e7d32;">✅ Excelente margen - Cobras {{ "%.1f"|format(multiplicador) }} veces el costo</span>
+                            <span style="color: #2e7d32;">✅ Excelente margen</span>
                         {% elif multiplicador >= 2 %}
-                            <span style="color: #f57c00;">⚠️ Margen moderado - Cobras {{ "%.1f"|format(multiplicador) }} veces el costo</span>
+                            <span style="color: #f57c00;">⚠️ Margen moderado</span>
                         {% else %}
-                            <span style="color: #d32f2f;">❌ Margen bajo - Solo cobras {{ "%.1f"|format(multiplicador) }} veces el costo</span>
+                            <span style="color: #d32f2f;">❌ Margen bajo</span>
                         {% endif %}
                     </div>
                 </div>
@@ -173,11 +180,13 @@
                 
                 <!-- Información de la Receta -->
                 <div style="margin-top: 1rem;">
-                    <h4>📝 Información de la Receta</h4>
+                    <h4>📝 Info Receta</h4>
                     <p><strong>Nombre:</strong> {{ receta.nombre }}</p>
-                    <p><strong>Descripción:</strong> {{ receta.descripcion or "Sin descripción" }}</p>
-                    <p><strong>Creada:</strong> {{ receta.fecha_creacion[:16] }}</p>
-                    <p><strong>Modificada:</strong> {{ receta.fecha_modificacion[:16] }}</p>
+                    {% if receta.descripcion %}
+                    <p><strong>Descripción:</strong> {{ receta.descripcion }}</p>
+                    {% endif %}
+                    <p><strong>Creada:</strong> {{ receta.fecha_creacion[:10] }}</p>
+                    <p><strong>Modificada:</strong> {{ receta.fecha_modificacion[:10] }}</p>
                 </div>
                 
                 <!-- Botones de Acción -->
@@ -189,8 +198,8 @@
                         🔧 Cambiar Margen
                     </button>
                     
-                    <form method="POST" action="{{ url_for('eliminar_receta', id=receta.id) }}" style="display: inline;">
-                        <button type="submit" class="btn" style="background-color: #f56565;" 
+                    <form method="POST" action="{{ url_for('eliminar_receta', id=receta.id) }}" style="display: inline; flex: 1;">
+                        <button type="submit" class="btn" style="background-color: #f56565; width: 100%;" 
                                 onclick="return confirm('¿Estás seguro de que quieres eliminar esta receta? Esta acción no se puede deshacer.')">
                             🗑️ Eliminar
                         </button>
